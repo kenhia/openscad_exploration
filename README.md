@@ -79,3 +79,8 @@ the F360 files in a repo and might even post the drawers and blank nameplates to
 one of the model sharing sites.
 
 ![Modded Akro Mills storage cabinet](/images/akro_mills_modded.jpg)
+
+FWIW, this is an older picture with some of the nameplates from F360 with text,
+some from F360 as blanks with text added in slicer, and a couple (one?) from
+the nameplate OpenSCAD file in this repo. I didn't reprint all of them, but I
+did reprint all the ones that weren't black on white.
