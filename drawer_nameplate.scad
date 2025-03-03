@@ -1,6 +1,6 @@
-t1 = "Line1";
-t2 = "Line2";
+text_lines = ["M3x8", "BHCS"];
 tsize = 8;
+margin_top = 4;
 
 module nameplate_layer(
     width = 50,
@@ -43,11 +43,43 @@ module nameplate_layer(
     }
 }
 
+module nameplate_text_lines(
+    lines = ["M3x8", "BHCS"],
+    text_size = 8,
+    text_thick = 0.4,
+    center_x,
+    top_y,
+    space_y,
+    z_trans
+) {
+    num_lines = len(lines);
+    line_interspace_y = space_y / num_lines;
+    for ( index = [0:num_lines-1] ) {
+        trans = [
+            center_x,
+            top_y - line_interspace_y * index,
+            z_trans
+        ];
+        translate(trans)
+            color("cyan")
+            linear_extrude(text_thick)
+            text(
+                text = lines[index],
+                size = text_size,
+                valign = "top",
+                halign = "center",
+                $fn=100
+            );
+    }
+}
 
 module drawer_nameplate (
     text1 = "M3x8",
     text2 = "BHCS",
-    text_size = 8
+    text_lines = ["M3x8", "BHCS", "Foo", "Bar", "Baz"],
+    text_size = 8,
+    text_margin_top = 4,
+    old_way = false
 ){
     width = 50;
     height = 34;
@@ -58,7 +90,6 @@ module drawer_nameplate (
     p_from_top = 0;
     font = "Calibri:style=Regular";
     text_thick = 0.4;
-    text_margin_top = 4;
 
     union() {
         // base
@@ -71,38 +102,26 @@ module drawer_nameplate (
         translate([p_x_trans, p_y_trans, base_thick-0.001])
             nameplate_layer(width = p_width, height = p_height, thick = p_thick, chamfer_top = true, top_radius = 0);
 
-        line_1_trans = [
-            width/2,
-            height - p_from_top - p_thick - text_margin_top,
-            base_thick + p_thick - 0.001
-        ];
-        line_2_trans = [
-            width/2,
-            line_1_trans.y - 12,
-            base_thick + p_thick - 0.001
-        ];
-        translate(line_1_trans)
-        color("cyan")
-        linear_extrude(text_thick)
-        text(
-            text=text1,
-            size = text_size,
-            valign = "top",
-            halign = "center",
-            $fn=100
-        );
-        translate(line_2_trans)
-        color("cyan")
-        linear_extrude(text_thick)
-        text(
-            text=text2,
-            size = text_size,
-            valign = "top",
-            halign = "center",
-            $fn=100
-        );
+        // Measurements needed for the text
+        text_center_x = width / 2;
+        text_top_y = height - p_from_top - p_thick - text_margin_top;
+        text_space_y = p_height - (2 * p_thick) - text_margin_top;
+        text_z_trans = base_thick + p_thick - 0.001;
 
+        nameplate_text_lines(
+            lines = text_lines,
+            text_size = text_size,
+            text_thick = text_thick,
+            center_x = text_center_x,
+            top_y = text_top_y,
+            space_y = text_space_y,
+            z_trans = text_z_trans
+        );
     }
 }
 
-drawer_nameplate(text1 = t1, text2 = t2, text_size=5.5);
+drawer_nameplate(
+    text_lines = text_lines,
+    text_size=tsize,
+    text_margin_top = margin_top
+);
