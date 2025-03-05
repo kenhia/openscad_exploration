@@ -1,6 +1,6 @@
 text_lines = ["M3x8", "BHCS"];
-tsize = 8;
-margin_top = 4;
+tsize = 5.9;
+margin_top = 4.0;
 
 module nameplate_layer(
     width = 50,
@@ -74,37 +74,40 @@ module nameplate_text_lines(
 }
 
 module drawer_nameplate (
-    text1 = "M3x8",
-    text2 = "BHCS",
     text_lines = ["M3x8", "BHCS", "Foo", "Bar", "Baz"],
     text_size = 8,
     text_margin_top = 4,
-    old_way = false
+    width = 50,
+    height = 34,
+    base_thick = 0.6,
+    base_chamfer_top = false,
+    top_radius = 1.75,
+    p_thick = 1.4,
+    p_chamfer_top = true,
+    p_top_margin = 0,
+    p_side_margin = 2.75,
+    p_bottom_margin = 2.75,
+    font = "Calibri:style=Regular"
 ){
-    width = 50;
-    height = 34;
-    base_thick = 0.6;
-    p_thick = 1.4;
-    p_width = width - (2*2.75);
-    p_height = height - 2.75;
-    p_from_top = 0;
-    font = "Calibri:style=Regular";
+    p_width = width - (2*p_side_margin);
+    p_height = height - p_bottom_margin;
     text_thick = 0.4;
 
     union() {
         // base
-        nameplate_layer(width = 50, height = 34, thick = base_thick, chamfer_top=false, top_radius=1.75);
+        nameplate_layer(width = width, height = height, thick = base_thick, chamfer_top=base_chamfer_top, top_radius=top_radius);
 
         // plate
-        p_y_trans = height - p_height - p_from_top;
+        p_y_trans = height - p_height - p_top_margin;
         p_x_trans = (width -p_width) / 2;
         // keep things from being exact
         translate([p_x_trans, p_y_trans, base_thick-0.001])
-            nameplate_layer(width = p_width, height = p_height, thick = p_thick, chamfer_top = true, top_radius = 0);
+            nameplate_layer(width = p_width, height = p_height, thick = p_thick, chamfer_top = p_chamfer_top, top_radius = 0);
 
         // Measurements needed for the text
         text_center_x = width / 2;
-        text_top_y = height - p_from_top - p_thick - text_margin_top;
+        chamfer_adjust = p_chamfer_top ? p_thick : 0;
+        text_top_y = height - p_top_margin - chamfer_adjust - text_margin_top;
         text_space_y = p_height - (2 * p_thick) - text_margin_top;
         text_z_trans = base_thick + p_thick - 0.001;
 
